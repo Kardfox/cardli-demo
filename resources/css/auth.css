@@ -1,0 +1,88 @@
+html {
+    height: 90%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    color: #363636;
+}
+
+#variants {
+    margin-top: 10%;
+    text-align: center;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.label {
+    font-size: 250%;
+    color: #00ccff;
+    text-align: center;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    padding-inline: 5%;
+}
+
+#loginRadioLabel {
+    border-radius: 50px 0 0 50px;
+}
+
+#signupRadioLabel {
+    border-radius: 0 50px 50px 0;
+}
+
+input[type="radio"]:checked + .label {
+    background-color: #00ccff;
+    color: white;
+}
+
+
+#login {
+    margin-top: 8%;
+    text-align: center;
+}
+
+#signup {
+    margin-top: 8%;
+    text-align: center;
+    display: none;
+}
+
+button {
+    border: none;
+    color: white;
+    border-radius: 25px;
+    padding: 2%;
+    width: 30%;
+    background-color: #00ccff;
+    display: block;
+    font-size: 250%;
+    margin: auto;
+    margin-top: 5%;
+}
+
+input {
+    font-size: 300%;
+    margin-top: 5%;
+    padding: 3%;
+    border: 1px solid #00ccff;
+    border-radius: 25px;
+}
+
+input:focus {
+    background-color: #00ccff2c;
+}
+
+.error {
+    color: rgb(255, 0, 0);
+    font-size: smaller;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    font-size: 250%;
+}

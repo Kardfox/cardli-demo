@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <link href="{{ url_for('static', filename='css/auth.css') }}" rel="stylesheet"/>
+        <title>Cardli</title>
+    </head>
+    <body>
+        <!-- <div id="login">
+            <p class="titleSection">Войти</p>
+
+            <input type="hidden" value="{{ csrf_token() }}">
+            <input type="email" maxlength="45" placeholder="Эл. почта" required>
+            <input type="password" minlength="8" placeholder="Пароль" required>
+
+            <button id="loginButton">Войти</button>
+        </div>
+        <div id="signup">
+            <p class="titleSection">Регистрация</p>
+
+            <input type="hidden" value="{{ csrf_token() }}">
+            <input type="text" minlength="2" maxlength="45" placeholder="Имя" required>
+            <input type="text" minlength="2" maxlength="60" placeholder="Фамилия" required>
+            <input type="email" maxlength="45" placeholder="Эл. почта" required>
+            <input type="password" minlength="8" placeholder="Пароль" required>
+            <input type="password" minlength="8" placeholder="Пароль(повторно)" required>
+
+            <button id="signupButton">Регистрация</button>
+        </div> -->
+
+        <div id="variants">
+            <input id="loginRadio" type="radio" name="variant" value="login" checked>
+            <label id="loginRadioLabel" class="label" for="loginRadio">Войти</label>
+
+            <input id="signupRadio" type="radio" name="variant" value="signup">
+            <label id="signupRadioLabel" class="label" for="signupRadio">Регистрация</label>
+        </div>
+
+        <div id="login">
+            <input type="hidden" value="{{ csrf_token() }}">
+            <input type="email" maxlength="45" placeholder="Эл. почта" required>
+            <input type="password" minlength="8" placeholder="Пароль" required>
+
+            <button id="loginButton">Войти</button>
+        </div>
+
+        <div id="signup">
+            <input type="hidden" value="{{ csrf_token() }}">
+            <input type="text" minlength="2" maxlength="45" placeholder="Имя" required>
+            <input type="text" minlength="2" maxlength="60" placeholder="Фамилия" required>
+            <input type="email" maxlength="45" placeholder="Эл. почта" required>
+            <input type="password" minlength="8" placeholder="Пароль" required>
+            <input type="password" minlength="8" placeholder="Пароль(повторно)" required>
+
+            <button id="signupButton">Регистрация</button>
+    </body>
+
+    <script type="module" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</html>

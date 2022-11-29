@@ -1,0 +1,280 @@
+html {
+    height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    margin: 0%;
+    color: #363636;
+}
+
+header {
+    top: 0%;
+    background-color: white;
+    position: sticky;
+}
+
+h3 {
+    margin: 0%;
+}
+
+a {
+    text-decoration: none;
+    color: #5c5c5c;
+}
+
+button {
+    border: none;
+    border-radius: 50px;
+    background-color: white;
+}
+
+#menuIcon {
+    width: 10%;
+    margin: 5%;
+    margin-right: 4%;
+    display: inline;
+    vertical-align: middle;
+}
+
+#menuModal {
+    background-color: rgba(0, 0, 0, 0.616);
+    top: 0;
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+#menuContent {
+    background-color: white;
+    top: 0;
+    z-index: 2;
+    width: 80%;
+    height: 100%;
+    border-radius: 0px 50px 50px 0px;
+    position: fixed;
+}
+
+#backIcon {
+    width: 14%;
+    margin: 5%;
+    margin-bottom: 0%;
+    display: inline;
+}
+
+#menuTitle {
+    text-align: center;
+    font-size: 300%;
+    margin-bottom: 20%;
+    margin-top: 0%;
+}
+
+.icon {
+    display: inline;
+    vertical-align: middle;
+    width: 10%;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.menuButton {
+    display: inline;
+    vertical-align: middle;
+    font-size: 250%;
+    color: #5c5c5c;
+}
+
+.menuItem {
+    margin-bottom: 10%;
+}
+
+/* #logoutButton {
+    visibility: collapse;
+}
+
+#syncButton {
+    visibility: collapse;
+} */
+
+#username {
+    margin: 5%;
+    margin-left: 0%;
+    margin-right: 0%;
+    font-size: 350%;
+    width: fit-content;
+    display: inline;
+    vertical-align: middle;
+}
+
+#addCard {
+    display: inline;
+    margin-left: 2%;
+    background-color: #00ccff;
+    border-radius: 100px;
+    font-size: 300%;
+    padding: 3%;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+#cardsContainer {
+    height: 85%;
+}
+
+.card {
+    border-radius: 25px;
+    width: 98%;
+    height: 50%;
+    color: white;
+    margin: 0 auto;
+    padding-top: 1%;
+    display: block;
+}
+
+.cardName {
+    font-size: 300%;
+    margin-left: 5%;
+    margin-bottom: 10px;
+}
+
+.barcode {
+    width: 75%;
+    border-radius: 50px;
+    margin: 0 auto;
+    visibility: hidden;
+    display: block;
+    z-index: 1;
+}
+
+.deleteCardButton {
+    width: 75%;
+    height: 15%;
+    margin: 0 auto;
+    display: block;
+    visibility: hidden;
+    font-size: 300%;
+    margin-top: 5px;
+    z-index: 1;
+}
+
+#modalScanWindow {
+    background-color: rgba(0, 0, 0, 0.616);
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    overflow: auto;
+    width: 98%;
+    height: 98%;
+    border-radius: 30px;
+    margin: 1%;
+}
+
+#cancelScan {
+    color: white;
+    margin-top: 5%;
+    margin-left: 5%;
+    width: fit-content;
+    font-weight: 400;
+    font-size: 300%;
+}
+
+#cameraStream {
+    /* background-color: white; */
+    display: block;
+    margin: 0 auto;
+    height: 70%;
+    width: 80%;
+}
+
+#barCodeInput {
+    width: 70%;
+    display: inline;
+    text-align: center;
+    margin-left: 3%;
+    margin-top: 10px;
+    font-size: 230%;
+}
+
+#enterBarCode {
+    font-size: 230%;
+    width: 22%;
+}
+
+#cardsInfo {
+    color: gray;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 300%;
+}
+
+#barCodeInfo {
+    color: white;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 250%;
+    margin-top: -2%;
+}
+
+#addNewCard {
+    height: 100%;
+    padding-top: 10%;
+}
+
+#newCardName {
+    font-size: 250%;
+    width: 50%;
+    margin: 0 auto;
+    display: block;
+}
+
+label {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+#newCardColor {
+    display: block;
+    width: 50%;
+    height: 4%;
+    margin: 0 auto;
+}
+
+#addNewCardButton {
+    display: block;
+    margin: 0 auto;
+    font-size: 250%;
+    margin-top: 8%;
+    width: 40%;
+    padding: 10px;
+}
+
+.info {
+    color: white;
+    font-weight: 400;
+    font-size: 250%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.error {
+    color: rgb(255, 0, 0);
+    font-size: smaller;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    font-size: 250%;
+}

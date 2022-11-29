@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet"/>
+        <title>Cardli</title>
+    </head>
+    <body>
+        <header>
+            <img id="menuIcon" src="{{ url_for('static', filename='menu-icon.png') }}">
+            <h3 id="username">Без авторизации</h3>
+            <button id="addCard">Добавить</button>
+        </header>
+        <div id="cardsContainer"></div>
+    </body>
+
+    <!-- MODAL ADD BARCODE -->
+    <div id="modalScanWindow" hidden>
+        <div id="scanBarCode">
+            <h4 id="cancelScan">Пропустить</h4>
+            <h3 id="barCodeInfo">Наведите камеру на штрих-код</h3>
+            <video id="cameraStream" autoplay muted playsinline></video>
+            <input id="barCodeInput" type="number" placeholder="Или наберите номер здесь...">
+            <button id="enterBarCode">Ввести</button>
+        </div>
+        <div id="addNewCard" hidden>
+            <label class="info" for="newCardName">Введите название:<br></label>
+            <input id="newCardName" type="text" min="1">
+            <label class="info" for="newCardColor">Выберите цвет:<br></label>
+            <input id="newCardColor" type="color">
+            <button id="addNewCardButton">Добавить</button>
+        </div>
+    </div>
+
+    <!-- MENU -->
+    <div id="menuModal" hidden>
+        <div id="menuContent">
+            <img id="backIcon" src="{{ url_for('static', filename='back-icon.png') }}">
+            <h1 id="menuTitle">Меню</h1>
+
+            <div id="syncButton" class="menuItem">
+                <img class="icon" src="{{ url_for('static', filename='sync-icon.png') }}">
+                <h3 class="menuButton">Синхронизировать</h3>
+            </div>
+
+            <div id="loginButton" class="menuItem">
+                <img class="icon" src="{{ url_for('static', filename='login-icon.png') }}">
+                <h3 class="menuButton"><a href="/auth">Войти в аккаунт</a></h3>
+            </div>
+
+            <div id="logoutButton" class="menuItem">
+                <img id="logoutIcon" class="icon" src="{{ url_for('static', filename='logout-icon.png') }}">
+                <h3 class="menuButton">Выйти</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDENS -->
+    <canvas id="imageCanvas" hidden></canvas>
+    <input id="csrf" type="hidden" value="{{ csrf_token() }}">
+
+    <!-- SCRIPTS -->
+    <script type="module" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</html>
