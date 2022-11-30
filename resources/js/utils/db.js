@@ -18,7 +18,7 @@ export const openDb = (version) => {
             }
     
             db.createObjectStore("user", {keyPath: "id"})
-            db.createObjectStore("cards", {keyPath: "barcode" })
+            db.createObjectStore("cards", {keyPath: "id" })
         }
 
         openRequest.onsuccess = (event) => resolve(event.target.result)

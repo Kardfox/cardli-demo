@@ -8,7 +8,7 @@ export const api = {
     logout: "/api/auth/logout",
     // CARDS
     add_card: "/api/user/cards",
-    get_all_cards: "/api/user/cards/",
+    get_cards: "/api/user/cards",
     get_cards_by_id: "/api/user/cards/<id>",
     change_card_by_id: "/api/user/cards/<id>",
     delete_card_by_id: "/api/user/cards/<id>",

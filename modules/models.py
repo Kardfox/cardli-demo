@@ -25,6 +25,10 @@ class Model:
     def dict(self):
         return self.__dict__
     
+    @property
+    def tuple(self):
+        return tuple(self.__dict__.values())
+
     def __repr__(self):
         return f"{self.__class__.__name__} {self.json}"
 

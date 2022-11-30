@@ -23,7 +23,7 @@ csrf = CSRFProtect(app)
 #========================================================= API =========================================================
 
 #   AUTH
-
+@csrf.exempt
 @app.post("/api/auth/login")
 # REQUIRES: [email, password]
 # RETURN: [
@@ -84,25 +84,26 @@ def api_logout():
         return flask.Response(*SERVER_ERROR)
 
 #  CARDS
-
-@app.get("/api/user/cards/")
+@csrf.exempt
+@app.get("/api/user/cards")
 # REQUIRES: [cookies: token]
 # RETURN: [
 #     Card(id, color, bar_code, name, user_id, family_id)[]
 #     errors: [400, 410, 500]
 # ]
-def get_all_cards():
+def get_cards():
     try:
         token = Auth.check_token(flask.request.cookies["token"])
         if token == None: return flask.Response(*TOKEN_IS_DEAD)
 
         cards = {}
+        print(token.user_id)
 
-        sql.cursor.execute("SELECT * FROM `cards` WHERE user_id=%s AND family_id IS NULL", token.user_id)
-        cards["personal"] = sql.cursor.fetchall()
+        sql.cursor.execute(f"SELECT * FROM `cards` WHERE user_id='{token.user_id}' AND family_id IS NULL")
+        cards["personal"] = [card.json for card in sql.get()]
 
-        sql.cursor.execute("SELECT * FROM `cards` WHERE user_id=%s AND family_id", token.user_id)
-        cards["family"] = sql.cursor.fetchall()
+        sql.cursor.execute(f"SELECT * FROM `cards` WHERE user_id='{token.user_id}' AND family_id")
+        cards["family"] = [card.json for card in sql.get()]
 
         return flask.jsonify(cards)
 
@@ -126,19 +127,12 @@ def add_card():
 
         new_card = Cards(**_json)
 
-        sql.cursor.execute(
-            """
-                INSERT INTO `cards` VALUES (
-                    %(id)s,
-                    %(color)s,
-                    %(barcode)s,
-                    %(name)s,
-                    %(user_id)s,
-                    %(family_id)s,
-                    %(image)s,
-                    %(type)s
-            )""", new_card.dict
-        )
+        sql.cursor.execute("INSERT INTO `cards` VALUES (?, ?, ?, ?, ?, ?, ?, ?)", new_card.tuple)
+        sql.commit()
+
+        print(token.user_id)
+        sql.cursor.execute(f"SELECT * FROM `cards` WHERE user_id='{token.user_id}' AND family_id IS NULL")
+        print(sql.get())
 
         return flask.Response("", *SUCCESS)
 
@@ -159,7 +153,7 @@ def delete_card_by_id(id):
     user = Auth.check_token(flask.request.cookies["token"], return_user=True)
     if user == None: return flask.Response(*TOKEN_IS_DEAD)
 
-    sql.cursor.execute("DELETE FROM `cards` WHERE id=%s AND user_id=%s", (id, user.id))
+    sql.cursor.execute("DELETE FROM `cards` WHERE id=? AND user_id=?", (id, user.id))
 
     return flask.Response("", *SUCCESS)
 

@@ -208,7 +208,7 @@ const showMenu = () => menuModal.removeAttr("hidden")
 const hideMenu = () => menuModal.attr("hidden", true)
 
 const sync = async (db) => {
-    const response = await fetch(api.get_all_cards)
+    const response = await fetch(api.get_cards)
     let newCards = await response.json()
     newCards.personal.forEach((element) => {
         saveCardToDb(db, element)
@@ -221,7 +221,7 @@ $("#backIcon").click(hideMenu)
 
 const initAuth = () => {
     checkLogin(db).then(async (login) => {
-        let checkInet = await fetch(api.get_all_cards)
+        let checkInet = await fetch(api.get_cards)
 
         if (login) {
             getUser(db).onsuccess = event => {

@@ -32,7 +32,7 @@ class Generator:
 class Auth:
     def login(email, password):
         try:
-            sql.cursor.execute("SELECT * FROM `users` WHERE email=%s", email)
+            sql.cursor.execute(f"SELECT * FROM `users` WHERE email='{email}'")
 
             user = Users(**sql.cursor.fetchone())
             if check_password_hash(user.password, password):
@@ -43,12 +43,10 @@ class Auth:
                     user_id = user.id
                 )
 
-                sql.cursor.execute("""
-                    INSERT INTO tokens VALUES (
-                        %(token)s,
-                        %(user_id)s
-                    )
-                """, token.dict)
+                sql.cursor.execute("INSERT INTO tokens VALUES (?, ?)", token.tuple)
+                sql.commit()
+
+                print(user.json)
 
                 response = Response(user.json, 200, mimetype="application/json")
                 response.set_cookie(
@@ -77,16 +75,8 @@ class Auth:
                 password=generate_password_hash(password)
             )
 
-            sql.cursor.execute("""
-                INSERT INTO `users` VALUES (
-                    %(id)s,
-                    %(name)s,
-                    %(surname)s,
-                    %(family_id)s,
-                    %(email)s,
-                    %(password)s
-                )
-            """, new_user.dict)
+            sql.cursor.execute("INSERT INTO `users` VALUES (?, ?, ?, ?, ?, ?)", new_user.tuple)
+            sql.commit()
 
             return Auth.login(email, password)
 
@@ -97,7 +87,8 @@ class Auth:
         try:
             token = Auth.check_token(token)
 
-            sql.cursor.execute("DELETE FROM `tokens` WHERE token=%s", token)
+            sql.cursor.execute(f"DELETE FROM `tokens` WHERE token='{token}'")
+            sql.commit()
 
             response = Response("", 200)
             response.delete_cookie("token")
@@ -110,11 +101,11 @@ class Auth:
 
     def check_token(token, return_user=False):
         try:
-            sql.cursor.execute("SELECT * FROM `tokens` WHERE token=%s", token)
+            sql.cursor.execute(f"SELECT * FROM `tokens` WHERE token='{token}'")
             token = Tokens(**sql.cursor.fetchone())
 
             if return_user:
-                sql.cursor.execute("SELECT * FROM `users` WHERE id=%s", token.user_id)
+                sql.cursor.execute(f"SELECT * FROM `users` WHERE id='{token.user_id}'")
                 return Users(**sql.cursor.fetchone())
             return token
 
