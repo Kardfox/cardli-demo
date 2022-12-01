@@ -43,11 +43,12 @@ function addNewCard(data) {
             showCards()
         })
 
-        fetch(api.add_card, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(cardData)
-        })
+        if (canSend)
+            fetch(api.add_card, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(cardData)
+            })
     }
 }
 
@@ -64,22 +65,17 @@ function showCards(include) {
 
     const deleteCard = (event) => {
         deleteCardFromDb(DB, event.target.parentElement.dataset.id)
-        .onsuccess = showCards
+        .then(() => showCards())
     }
 
     const cardsContainer = $("#cardsContainer")
 
     getCardsFromDb(DB).then(cards => {
         if (include) {
-            cards = cards.find(element => {
-                let name = element.name.toLowerCase()
-                name.indexOf(include) > 0
-            }) || []
+            cards = cards.filter(element => element.name.toLocaleLowerCase().startsWith(include))
         } else {
             cards = cards.reverse()
         }
-
-        console.log(cards)
 
         cardsContainer.empty()
 
@@ -221,6 +217,7 @@ function checkAuth() {
 
         switch (check.status) {
             case 200:
+                canSend = true
                 $("#syncButton").click(() => {
                     hideMenu()
                     sync(DB)
@@ -256,6 +253,7 @@ function checkAuth() {
 
 //  MAIN
 let DB
+let canSend = false
 openDb(1).then((openedDb) => {
     DB = openedDb
 

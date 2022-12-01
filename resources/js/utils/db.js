@@ -61,6 +61,16 @@ export function saveUserToDb(db, userData) {
     }).onsuccess = (_) => {
         window.location.replace(app.main)
     }
+
+    getCardsFromDb(db).then(cards => {
+        cards.forEach(card => {
+            fetch(api.add_card, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(card)
+            })
+        })
+    })
 }
 
 export function getCardsFromDb(db) {

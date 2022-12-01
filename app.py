@@ -70,9 +70,9 @@ def api_signup():
 #    errors: [400, 410, 500]
 # ]
 def api_logout():
-    try:
-        if not flask.request.cookies: return flask.Response("", *SUCCESS)
+    if not "token" in flask.request.cookies.keys(): return "", 400
 
+    try:
         return Auth.logout(flask.request.cookies["token"])
 
     except (TypeError, BadRequestKeyError) as e:
@@ -85,13 +85,15 @@ def api_logout():
 
 #  CARDS
 @csrf.exempt
-@app.get("/api/user/cards")
+@app.get("/api/user/cards/")
 # REQUIRES: [cookies: token]
 # RETURN: [
 #    [...Cards(id, color, barcode, image, name, type, user_id, family_id)...]
 #    errors: [400, 410, 500]
 # ]
 def get_cards():
+    if not "token" in flask.request.cookies.keys(): return "", 400
+
     try:
         token = Auth.check_token(flask.request.cookies["token"])
         if token == None: return flask.Response(*TOKEN_IS_DEAD)
@@ -115,7 +117,7 @@ def get_cards():
         return flask.Response(*SERVER_ERROR)
 
 @csrf.exempt
-@app.post("/api/user/cards")
+@app.post("/api/user/cards/")
 # REQUIRES: [
 #    cookies: token
 #    json: id, color, barcode, image, name, type, family_id
@@ -124,6 +126,8 @@ def get_cards():
 #    errors: [400, 410, 500]
 # ]
 def add_card():
+    if not "token" in flask.request.cookies.keys(): return "", 400
+
     try:
         token = Auth.check_token(flask.request.cookies["token"])
         if token == None: return flask.Response(*TOKEN_IS_DEAD)
@@ -161,6 +165,8 @@ def add_card():
 #    errors: [410, 500]
 # ]
 def delete_card_by_id(id):
+    if not "token" in flask.request.cookies.keys(): return "", 400
+
     user = Auth.check_token(flask.request.cookies["token"], return_user=True)
     if user == None: return flask.Response(*TOKEN_IS_DEAD)
 
