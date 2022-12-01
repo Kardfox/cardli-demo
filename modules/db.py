@@ -10,7 +10,7 @@ class DictRow(sqlite3.Row):
 
 class SQL:
     def __init__(self):
-        self.connection = sqlite3.connect("database.sqlite3", check_same_thread=False)
+        self.connection = sqlite3.connect("db.sqlite3", check_same_thread=False)
 
         self.connection.row_factory = DictRow
         self.cursor: sqlite3.Cursor = self.connection.cursor()
