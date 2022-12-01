@@ -10,12 +10,15 @@ class DictRow(sqlite3.Row):
 
 class SQL:
     def __init__(self):
-        self.connection = sqlite3.connect("database.db", check_same_thread=False)
-        # with open("schema.sql") as f:
-        #     self.connection.executescript(f.read())
-        self.connection.row_factory = DictRow
+        self.connection = sqlite3.connect("database.sqlite3", check_same_thread=False)
 
+        self.connection.row_factory = DictRow
         self.cursor: sqlite3.Cursor = self.connection.cursor()
+
+        check_created = self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        if not check_created.fetchall():
+            with open("schema.sql") as f:
+                self.connection.executescript(f.read())
 
     def commit(self):
         self.connection.commit()

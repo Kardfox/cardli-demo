@@ -1,10 +1,7 @@
 import {
-    openDb,
-    saveCardToDb,
-    deleteCardFromDb,
-    getCardsFromDb,
-    checkLogin,
-    getUser
+    checkLogin, deleteCardFromDb,
+    getCardsFromDb, getUser, openDb,
+    saveCardToDb, sendChanges
 } from "./utils/db.js"
 
 import {
@@ -12,8 +9,19 @@ import {
     app
 } from "./utils/urls.js"
 
-const addNewCard = (data) => {
-    const saveCard = () => {
+
+//  CARDS
+function addNewCard(data) {
+    const modal       = $("#modalScanWindow"),
+          addNewCard  = $("#addNewCard"),
+          scanBarCode = $("#scanBarCode")
+
+    $("#scanBarCode").attr("hidden", true)
+    addNewCard.attr("hidden", false)
+
+    const [newCardName, newCardColor, addNewCardButton] = addNewCard.find(":input")
+
+    addNewCardButton.onclick = () => {
         if (newCardName.value.length <= 2) {
             $(".error").remove()
             $(newCardName).after(`<p class="error">Слишком короткое название</p>`)
@@ -27,7 +35,7 @@ const addNewCard = (data) => {
             ...data
         }
 
-        saveCardToDb(db, cardData)
+        saveCardToDb(DB, cardData)
         .then(() => {
             modal.attr("hidden", true)
             scanBarCode.attr("hidden", false)
@@ -41,25 +49,77 @@ const addNewCard = (data) => {
             body: JSON.stringify(cardData)
         })
     }
-
-    const modal       = $("#modalScanWindow"),
-          addNewCard  = $("#addNewCard"),
-          scanBarCode = $("#scanBarCode")
-
-    $("#scanBarCode").attr("hidden", true)
-    addNewCard.attr("hidden", false)
-
-    const [newCardName, newCardColor, addNewCardButton] = addNewCard.find(":input")
-    addNewCardButton.onclick = saveCard
 }
 
-const scanBarCode = async () => {
-    const cancelSending = () => {
+function showCards(include) { 
+    const createCard = (id, name, color, src) => {
+        return `
+            <div class="card" style="background-color: ${color}" data-id="${id}">
+                <h1 class="cardName">${name}</h1>
+                <img class="barcode" src="${src}">
+                <button class="deleteCardButton">Удалить</button>
+            </div><br>
+        `
+    }
+
+    const deleteCard = (event) => {
+        deleteCardFromDb(DB, event.target.parentElement.dataset.id)
+        .onsuccess = showCards
+    }
+
+    const cardsContainer = $("#cardsContainer")
+
+    getCardsFromDb(DB).then(cards => {
+        if (include) {
+            cards = cards.find(element => {
+                let name = element.name.toLowerCase()
+                name.indexOf(include) > 0
+            }) || []
+        } else {
+            cards = cards.reverse()
+        }
+
+        console.log(cards)
+
+        cardsContainer.empty()
+
+        if (!cards.length) {
+            cardsContainer.append(
+                "<h3 id='cardsInfo'>Пока нет карточек</h3>"
+            ); return
+        }
+
+        cards.forEach(element => {
+            const card         = $(createCard(element.id, element.name, element.color, element.image)),
+                barcode      = card.find("img"),
+                deleteButton = card.find("button")
+
+            card.click((event) => {
+                if (event.target.className == "barcode") {
+                    barcode.css("visibility", "hidden")
+                    deleteButton.css("visibility", "hidden")
+                    return
+                }
+
+                barcode.css("visibility", "visible")
+                deleteButton.css("visibility", "visible")
+
+                deleteButton.click(deleteCard)
+            })
+
+            card.appendTo(cardsContainer)
+        })
+    })
+}
+
+//  BARCODE
+async function scanBarCode() {
+    function cancelSending() {
         if (stream) stream.getTracks().forEach(track => track.stop())
         send = false
     }
 
-    const takePicture = async () => {
+    async function takePicture() {
         if (!send) return
 
         const width = video.width(),
@@ -90,7 +150,7 @@ const scanBarCode = async () => {
             } else if (request.status == 408) {
                 alert("Вы в офлайне, некоторые функции недоступны")
                 cancelSending()
-                video.hide()
+                modal.hide()
             } else {
                 takePicture()
                 $("#barCodeInfo").text("Код не обнаружен")
@@ -104,21 +164,6 @@ const scanBarCode = async () => {
 
     let stream,
         send = true
-
-    $("#enterBarCode").click(() => {
-        const code = $("#barCodeInput").val()
-        if (code.length < 4) {
-            $(".error").remove()
-            video.after(`<p class="error">Слишком короткий код</p>`)
-            return
-        }
-        cancelSending()
-        addNewCard($("#barCodeInput").val())
-    })
-    $("#cancelScan").click(() => {
-        cancelSending()
-        modal.attr("hidden", true)
-    })
 
     modal.removeAttr("hidden")
     let constraints = {
@@ -137,69 +182,94 @@ const scanBarCode = async () => {
     video[0].srcObject = stream
 
     setTimeout(takePicture, 1000)
+
+    $("#enterBarCode").click(() => {
+        const code = $("#barCodeInput").val()
+        if (code.length < 4) {
+            $(".error").remove()
+            video.after(`<p class="error">Слишком короткий код</p>`)
+            return
+        }
+        cancelSending()
+        addNewCard($("#barCodeInput").val())
+    })
+
+    $("#cancelScan").click(() => {
+        cancelSending()
+        modal.attr("hidden", true)
+    })
 }
 
-const showCards = () => { 
-    const createCard = (id, name, color, src) => {
-        return `
-            <div class="card" style="background-color: ${color}" data-id="${id}">
-                <h1 class="cardName">${name}</h1>
-                <img class="barcode" src="${src}">
-                <button class="deleteCardButton">Удалить</button>
-            </div><br>
-        `
-    }
+//  ACCOUNT
+const sync = async () => {
+    fetch(api.get_cards).then(async (response) => {
+        let newCards = await response.json()
+        newCards.personal.forEach(element => saveCardToDb(DB, element))
+        showCards()
+    })
+}
 
-    const deleteCard = (event) => {
-        deleteCardFromDb(db, event.target.parentElement.dataset.id)
-        .onsuccess = showCards
-    }
+function checkAuth() {
+    checkLogin(DB).then(async (login) => {
+        let check = await fetch(api.get_cards)
 
-    const cardsContainer = $("#cardsContainer")
-
-    getCardsFromDb(db)
-    .onsuccess = (event) => {
-        cardsContainer.empty()
-        let cards = event.target.result
-
-        if (!cards.length) {
-            cardsContainer.append(
-                "<h3 id='cardsInfo'>У вас пока нет карточек</h3>"
-            ); return
+        if (login) {
+            getUser(DB).then(user => {
+                $("#username").text(user[0].name)
+            })
         }
 
-        cards.forEach(element => {
-            const card         = $(createCard(element.id, element.name, element.color, element.image)),
-                  barcode      = card.find("img"),
-                  deleteButton = card.find("button")
+        switch (check.status) {
+            case 200:
+                $("#syncButton").click(() => {
+                    hideMenu()
+                    sync(DB)
+                })
+                $("#loginButton").hide()
+                $("#logoutButton").click(() => {
+                    if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {
+                        let transaction = DB.transaction(["user", "cards"], "readwrite")
+                
+                        transaction.objectStore("user").clear()
+                        transaction.objectStore("cards").clear()
+                
+                        fetch(api.logout).then(() => {
+                            window.location.replace(app.main)
+                        })
+                    }
+                })
 
-            card.click((event) => {
-                if (event.target.className == "barcode") {
-                    barcode.css("visibility", "hidden")
-                    deleteButton.css("visibility", "hidden")
-                    return
-                }
+                sendChanges()
 
-                barcode.css("visibility", "visible")
-                deleteButton.css("visibility", "visible")
-
-                deleteButton.click(deleteCard)
-            })
-
-            card.appendTo(cardsContainer)
-        })
-    }
+                break
+            case 400: case 410:
+                $("#syncButton").hide()
+                $("#logoutButton").hide()
+                break
+            case 408:
+                $(".menuItem").hide()
+                $("#menuTitle").text("Нет подключения")
+                break
+        }
+    })
 }
 
-//  CARDS
-let db
+//  MAIN
+let DB
 openDb(1).then((openedDb) => {
-    db = openedDb
+    DB = openedDb
 
-    initAuth()
+    checkAuth()
     showCards()
 })
 $("#addCard").click(scanBarCode)
+
+//  SEARCH
+$("#searchCard").val("")
+$("#searchCard").on("input", (event) => {
+    const value = event.target.value.toLowerCase()
+    showCards(value)
+})
 
 //  MENU
 const menuModal = $("#menuModal")
@@ -207,67 +277,17 @@ const menuModal = $("#menuModal")
 const showMenu = () => menuModal.removeAttr("hidden")
 const hideMenu = () => menuModal.attr("hidden", true)
 
-const sync = async (db) => {
-    const response = await fetch(api.get_cards)
-    let newCards = await response.json()
-    newCards.personal.forEach((element) => {
-        saveCardToDb(db, element)
-    })
-    showCards()
-}
-
 $("#menuIcon").click(showMenu)
 $("#backIcon").click(hideMenu)
 
-const initAuth = () => {
-    checkLogin(db).then(async (login) => {
-        let checkInet = await fetch(api.get_cards)
-
-        if (login) {
-            getUser(db).onsuccess = event => {
-                $("#username").text(event.target.result[0].name)
-            }; logged()
-        } else {
-            notLogged()
-        }
-
-        if (checkInet.status == 408) {
-            $(".menuItem").hide()
-            $("#menuTitle").text("Нет подключения")
-        }
-    })
-}
-
-const logged = async () => {
-    $("#syncButton").click(() => {
-        hideMenu()
-        sync(db)
-    })
-    $("#loginButton").hide()
-    $("#logoutButton").click(async () => {
-        if (confirm("Вы уверены, что хотите выйти из аккаунта?")) {
-            let transaction = db.transaction(["user", "cards"], "readwrite")
-    
-            transaction.objectStore("user").clear()
-            transaction.objectStore("cards").clear()
-    
-            await fetch(api.logout)
-            window.location.replace(app.main)
-        }
-    })
-}
-
-const notLogged = () => {
-    $("#syncButton").hide()
-    $("#logoutButton").hide()
-}
-
-// SW
-const registerSW = () => {
+//  SW
+function registerSW() {
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker
                     .register("/sw.js")
                     .catch((error) => console.log(`Регистрация не завершена: ${error}`))
+    } else {
+        alert("У вас устаревший браузер, многие функции будут недоступны")
     }
 }
 

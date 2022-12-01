@@ -27,9 +27,9 @@ csrf = CSRFProtect(app)
 @app.post("/api/auth/login")
 # REQUIRES: [email, password]
 # RETURN: [
-#     body:    User(id, name, surname, family_id, email, password),
-#     cookies: [token]
-#     errors:  [403, 404, 500]
+#    body:    User(id, name, surname, family_id, email, password),
+#    cookies: [token]
+#    errors:  [403, 404, 500]
 # ]
 def api_login():
     try:
@@ -46,9 +46,9 @@ def api_login():
 @app.post("/api/auth/signup")
 # REQUIRES: [name, surname, email, password]
 # RETURN: [
-#     User(id, name, surname, family_id, email, password),
-#     cookies: [token]
-#     errors:  [409, 500]
+#    User(id, name, surname, family_id, email, password),
+#    cookies: [token]
+#    errors:  [409, 500]
 # ]
 def api_signup():
     try:
@@ -66,8 +66,8 @@ def api_signup():
 @app.get("/api/auth/logout")
 # REQUIRES: [cookies: token]
 # RETURN: [
-#     delete cookies,
-#     errors: [400, 410, 500]
+#    delete cookies,
+#    errors: [400, 410, 500]
 # ]
 def api_logout():
     try:
@@ -88,8 +88,8 @@ def api_logout():
 @app.get("/api/user/cards")
 # REQUIRES: [cookies: token]
 # RETURN: [
-#     Card(id, color, bar_code, name, user_id, family_id)[]
-#     errors: [400, 410, 500]
+#    [...Cards(id, color, barcode, image, name, type, user_id, family_id)...]
+#    errors: [400, 410, 500]
 # ]
 def get_cards():
     try:
@@ -97,7 +97,6 @@ def get_cards():
         if token == None: return flask.Response(*TOKEN_IS_DEAD)
 
         cards = {}
-        print(token.user_id)
 
         sql.cursor.execute(f"SELECT * FROM `cards` WHERE user_id='{token.user_id}' AND family_id IS NULL")
         cards["personal"] = [card.json for card in sql.get()]
@@ -117,6 +116,13 @@ def get_cards():
 
 @csrf.exempt
 @app.post("/api/user/cards")
+# REQUIRES: [
+#    cookies: token
+#    json: id, color, barcode, image, name, type, family_id
+# ]
+# RETURN: [
+#    errors: [400, 410, 500]
+# ]
 def add_card():
     try:
         token = Auth.check_token(flask.request.cookies["token"])
@@ -130,9 +136,7 @@ def add_card():
         sql.cursor.execute("INSERT INTO `cards` VALUES (?, ?, ?, ?, ?, ?, ?, ?)", new_card.tuple)
         sql.commit()
 
-        print(token.user_id)
         sql.cursor.execute(f"SELECT * FROM `cards` WHERE user_id='{token.user_id}' AND family_id IS NULL")
-        print(sql.get())
 
         return flask.Response("", *SUCCESS)
 
@@ -149,6 +153,13 @@ def add_card():
 
 @csrf.exempt
 @app.delete("/api/user/cards/<id>")
+# REQUIRES: [
+#    cookies: token
+#    json: id
+# ]
+# RETURN: [
+#    errors: [410, 500]
+# ]
 def delete_card_by_id(id):
     user = Auth.check_token(flask.request.cookies["token"], return_user=True)
     if user == None: return flask.Response(*TOKEN_IS_DEAD)
@@ -176,6 +187,10 @@ def auth():
 
 @csrf.exempt
 @app.post("/barcode")
+# REQUIRES: [
+#    b64image
+# ]
+# RETURN: []
 def barcode():
     url = flask.request.data.decode()
     content = url.split(';')[1]

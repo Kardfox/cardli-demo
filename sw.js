@@ -27,18 +27,18 @@ self.addEventListener("install", (event) => {
 
 const sendResponse = async (request) => {
     const responseFromCache = await caches.match(request);
-    if (responseFromCache) return responseFromCache
-    else {
-        try {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 5000)
-            const response = await fetch(request, {
-                signal: controller.signal
-            })
-            clearTimeout(id)
+    try {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 6000)
+        const response = await fetch(request, {
+            signal: controller.signal
+        })
+        clearTimeout(id)
 
-            return response
-        } catch(error) {
+        return response
+    } catch(error) {
+        if (responseFromCache) return responseFromCache
+        else {
             return new Response("{}", { status: 408 })
         }
     }

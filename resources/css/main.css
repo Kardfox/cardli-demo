@@ -38,6 +38,16 @@ button {
     vertical-align: middle;
 }
 
+#searchCard {
+    display: block;
+    width: 90%;
+    margin: 0 auto;
+    font-size: 300%;
+    border-radius: 25px;
+    padding: 2%;
+    margin-bottom: 2%;
+}
+
 #menuModal {
     background-color: rgba(0, 0, 0, 0.616);
     top: 0;
@@ -213,6 +223,7 @@ button {
     font-style: italic;
     font-weight: 400;
     font-size: 300%;
+    margin-top: 2%;
 }
 
 #barCodeInfo {
