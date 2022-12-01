@@ -4,14 +4,14 @@
 import { api, app } from "./urls.js"
 
 
-export let changes = []
-
 export function sendChanges() {
-    changes.forEach(element => fetch(element))
+    let changes = JSON.parse(localStorage.getItem("changes"))
+    changes.forEach(element => fetch(element.url, element.body))
+    localStorage.setItem("changes", "[]")
 }
 
 export function openDb(version) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const openRequest = indexedDB.open("db", version)
 
         openRequest.onupgradeneeded = event => {
@@ -30,7 +30,7 @@ export function openDb(version) {
 }
 
 export function checkLogin(db) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         let transaction = db.transaction("user", "readonly")
 
         transaction.objectStore("user")
@@ -42,7 +42,7 @@ export function checkLogin(db) {
 }
 
 export function getUser(db) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const transaction = db.transaction("user", "readonly")
         const request = transaction.objectStore("user").getAll()
 
@@ -74,7 +74,7 @@ export function saveUserToDb(db, userData) {
 }
 
 export function getCardsFromDb(db) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         const transaction = db.transaction("cards", "readonly")
         const request = transaction.objectStore("cards").getAll()
 
@@ -82,27 +82,58 @@ export function getCardsFromDb(db) {
     })
 }
 
-export function saveCardToDb(db, cardData) {
-    return new Promise((resolve) => {
+export function saveCardToDb(db, cardData, sync) {
+    return new Promise(resolve => {
         const transaction = db.transaction("cards", "readwrite")
         const request = transaction.objectStore("cards").add(cardData)
+
+        if (!sync) {
+            fetch(api.add_card, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(cardData)
+            })
+            .then((response) => {
+                if (response.status == 408) {
+                    const change =  {
+                        url: api.add_card,
+                        body: {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(cardData)
+                        }
+                    }
+
+                    let changes = JSON.parse(localStorage.getItem("changes"))
+                    changes.push(change)
+                    localStorage.setItem("changes", JSON.stringify(changes))
+                    alert(localStorage)
+                }
+            })
+        }
 
         request.onsuccess = event => resolve(event.target.result)
     })
 }
 
-export function deleteCardFromDb(db, id) {
-    const transaction = db.transaction("cards", "readwrite")
-    const request = transaction.objectStore("cards").delete(id)
+export async function deleteCardFromDb(db, id) {
+    return new Promise(resolve => {
+        const transaction = db.transaction("cards", "readwrite")
+        const request = transaction.objectStore("cards").delete(id)
 
-    const response = fetch(api.delete_card_by_id.replace("<id>", id), { method: "DELETE" })
-    response.then(() => {
-        if (response.status == 408) {
-            changes.push(
-                new Request(api.delete_card_by_id.replace("<id>", id), { method: "DELETE" })
-            )
-        }
+        fetch(api.delete_card_by_id.replace("<id>", id), { method: "DELETE" })
+        .then((response) => {
+            if (response.status == 408) {
+                const change = {
+                    url: api.delete_card_by_id.replace("<id>", id),
+                    body: { method: "DELETE" }
+                }
 
+                let changes = JSON.parse(localStorage.getItem("changes"))
+                changes.push(change)
+                localStorage.setItem("changes", JSON.stringify(changes))
+            }
+        })
         request.onsuccess = event => resolve(event.target.result)
     })
 }

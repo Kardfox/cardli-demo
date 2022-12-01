@@ -19,7 +19,6 @@ CREATE TABLE `cards` (
   `family_id` TEXT DEFAULT NULL,
   `barcode` TEXT NOT NULL,
   `id` TEXT NOT NULL,
-  `image` TEXT NOT NULL,
   `type` TEXT NOT NULL,
   `user_id` TEXT NOT NULL,
   UNIQUE(`id`)

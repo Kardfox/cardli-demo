@@ -131,8 +131,9 @@ button {
 
 .card {
     border-radius: 25px;
-    width: 98%;
-    height: 50%;
+    width: 95%;
+    height: fit-content;
+    padding: 2%;
     color: white;
     margin: 0 auto;
     padding-top: 1%;
@@ -142,16 +143,16 @@ button {
 .cardName {
     font-size: 300%;
     margin-left: 5%;
-    margin-bottom: 10px;
+    margin-bottom: 2%;
 }
 
 .barcode {
-    width: 75%;
     border-radius: 50px;
     margin: 0 auto;
     visibility: hidden;
     display: block;
     z-index: 1;
+    margin-bottom: 2%;
 }
 
 .deleteCardButton {
@@ -161,7 +162,7 @@ button {
     display: block;
     visibility: hidden;
     font-size: 300%;
-    margin-top: 5px;
+    padding: 1%;
     z-index: 1;
 }
 

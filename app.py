@@ -136,8 +136,9 @@ def add_card():
         _json["user_id"] = token.user_id
 
         new_card = Cards(**_json)
+        print(new_card)
 
-        sql.cursor.execute("INSERT INTO `cards` VALUES (?, ?, ?, ?, ?, ?, ?, ?)", new_card.tuple)
+        sql.cursor.execute(f"INSERT INTO `cards` {new_card.columns} VALUES (?, ?, ?, ?, ?, ?, ?)", new_card.tuple)
         sql.commit()
 
         sql.cursor.execute(f"SELECT * FROM `cards` WHERE user_id='{token.user_id}' AND family_id IS NULL")
@@ -171,6 +172,7 @@ def delete_card_by_id(id):
     if user == None: return flask.Response(*TOKEN_IS_DEAD)
 
     sql.cursor.execute("DELETE FROM `cards` WHERE id=? AND user_id=?", (id, user.id))
+    sql.commit()
 
     return flask.Response("", *SUCCESS)
 

@@ -8,7 +8,8 @@ const RESOURCES = [
     "/resources/html/fallback.html",
     "/resources/js/utils/db.js",
     "/resources/js/utils/urls.js",
-    "/resources/js/jquery.js",
+    "/resources/js/utils/jquery.js",
+    "/resources/js/utils/barcode.js",
     "/resources/js/main.js"
 ]
 
@@ -35,9 +36,12 @@ const sendResponse = async (request) => {
         })
         clearTimeout(id)
 
+
         return response
     } catch(error) {
-        if (responseFromCache) return responseFromCache
+        if (responseFromCache) {
+            return responseFromCache
+        }
         else {
             return new Response("{}", { status: 408 })
         }

@@ -28,6 +28,10 @@ class Model:
     @property
     def tuple(self):
         return tuple(self.__dict__.values())
+    
+    @property
+    def columns(self):
+        return tuple(self.dict.keys())
 
     def __repr__(self):
         return f"{self.__class__.__name__} {self.json}"
@@ -45,7 +49,6 @@ class Cards(Model):
     id: str
     color: int
     barcode: str
-    image: str
     name: str
     type: str
     user_id: str

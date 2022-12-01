@@ -1,0 +1,12 @@
+2022-12-02 00:08:34,115 - ERROR - app.py/add_card:
+UNIQUE constraint failed: cards.id
+Traceback (most recent call last):
+  File "/home/kardfox/cardli-demo/app.py", line 141, in add_card
+    sql.cursor.execute(f"INSERT INTO `cards` {new_card.columns} VALUES (?, ?, ?, ?, ?, ?, ?)", new_card.tuple)
+sqlite3.IntegrityError: UNIQUE constraint failed: cards.id
+2022-12-02 00:08:34,184 - ERROR - app.py/add_card:
+UNIQUE constraint failed: cards.id
+Traceback (most recent call last):
+  File "/home/kardfox/cardli-demo/app.py", line 141, in add_card
+    sql.cursor.execute(f"INSERT INTO `cards` {new_card.columns} VALUES (?, ?, ?, ?, ?, ?, ?)", new_card.tuple)
+sqlite3.IntegrityError: UNIQUE constraint failed: cards.id

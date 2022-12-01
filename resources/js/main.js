@@ -11,7 +11,7 @@ import {
 
 
 //  CARDS
-function addNewCard(data) {
+function addNewCard(barcode, type) {
     const modal       = $("#modalScanWindow"),
           addNewCard  = $("#addNewCard"),
           scanBarCode = $("#scanBarCode")
@@ -32,7 +32,9 @@ function addNewCard(data) {
             name: newCardName.value,
             color: newCardColor.value,
             family_id: null,
-            ...data
+            id: `${Date.now()}`.slice(2, 12),
+            type: type,
+            barcode: barcode
         }
 
         saveCardToDb(DB, cardData)
@@ -42,22 +44,23 @@ function addNewCard(data) {
             addNewCard.attr("hidden", true)
             showCards()
         })
-
-        if (canSend)
-            fetch(api.add_card, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(cardData)
-            })
     }
 }
 
 function showCards(include) { 
-    const createCard = (id, name, color, src) => {
+    const createCard = (id, name, color, barcode, type) => {
         return `
             <div class="card" style="background-color: ${color}" data-id="${id}">
                 <h1 class="cardName">${name}</h1>
-                <img class="barcode" src="${src}">
+                <svg class="barcode"
+                    jsbarcode-value=${barcode}
+                    jsbarcode-format=${type}
+                    jsbarcode-width=6
+                    jsbarcode-height=300
+                    jsbarcode-fontOptions=italic
+                    jsbarcode-fontSize=35
+                    jsbarcode-margin=20>
+                </svg>
                 <button class="deleteCardButton">Удалить</button>
             </div><br>
         `
@@ -65,7 +68,7 @@ function showCards(include) {
 
     const deleteCard = (event) => {
         deleteCardFromDb(DB, event.target.parentElement.dataset.id)
-        .then(() => showCards())
+        .then(showCards)
     }
 
     const cardsContainer = $("#cardsContainer")
@@ -86,12 +89,17 @@ function showCards(include) {
         }
 
         cards.forEach(element => {
-            const card         = $(createCard(element.id, element.name, element.color, element.image)),
-                barcode      = card.find("img"),
-                deleteButton = card.find("button")
+            const card         = $(createCard(
+                                    element.id,
+                                    element.name,
+                                    element.color,
+                                    element.barcode,
+                                    element.type)),
+                barcode        = card.find("svg"),
+                deleteButton   = card.find("button")
 
             card.click((event) => {
-                if (event.target.className == "barcode") {
+                if (event.target.nodeName == "rect") {
                     barcode.css("visibility", "hidden")
                     deleteButton.css("visibility", "hidden")
                     return
@@ -104,6 +112,8 @@ function showCards(include) {
             })
 
             card.appendTo(cardsContainer)
+
+            JsBarcode(".barcode").init()
         })
     })
 }
@@ -142,11 +152,11 @@ async function scanBarCode() {
 
             if (json.barcode) {
                 cancelSending()
-                addNewCard(json)
+                addNewCard(json.barcode, json.type)
             } else if (request.status == 408) {
                 alert("Вы в офлайне, некоторые функции недоступны")
                 cancelSending()
-                modal.hide()
+                video.hide()
             } else {
                 takePicture()
                 $("#barCodeInfo").text("Код не обнаружен")
@@ -181,13 +191,17 @@ async function scanBarCode() {
 
     $("#enterBarCode").click(() => {
         const code = $("#barCodeInput").val()
-        if (code.length < 4) {
+        if (code.length < 13) {
+            $(".error").remove()
+            video.after(`<p class="error">Слишком короткий код</p>`)
+            return
+        } else if (code.length > 13) {
             $(".error").remove()
             video.after(`<p class="error">Слишком короткий код</p>`)
             return
         }
         cancelSending()
-        addNewCard($("#barCodeInput").val())
+        addNewCard($("#barCodeInput").val(), "ean13")
     })
 
     $("#cancelScan").click(() => {
@@ -200,7 +214,7 @@ async function scanBarCode() {
 const sync = async () => {
     fetch(api.get_cards).then(async (response) => {
         let newCards = await response.json()
-        newCards.personal.forEach(element => saveCardToDb(DB, element))
+        newCards.personal.forEach(element => saveCardToDb(DB, element, true))
         showCards()
     })
 }

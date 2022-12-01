@@ -60,6 +60,7 @@
     <input id="csrf" type="hidden" value="{{ csrf_token() }}">
 
     <!-- SCRIPTS -->
-    <script type="module" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/utils/jquery.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/utils/barcode.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </html>
