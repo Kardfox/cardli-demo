@@ -87,7 +87,7 @@ class Auth:
         try:
             token = Auth.check_token(token)
 
-            sql.cursor.execute(f"DELETE FROM `tokens` WHERE token='{token}'")
+            sql.cursor.execute(f"DELETE FROM `tokens` WHERE token='{token.token}'")
             sql.commit()
 
             response = Response("", 200)

@@ -78,7 +78,7 @@ button {
 #menuTitle {
     text-align: center;
     font-size: 300%;
-    margin-bottom: 20%;
+    margin-bottom: 30%;
     margin-top: 0%;
 }
 
@@ -99,6 +99,7 @@ button {
 
 .menuItem {
     margin-bottom: 10%;
+    margin-left: 2%;
 }
 
 #username {

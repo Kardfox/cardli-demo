@@ -21,9 +21,7 @@ input[type="radio"] {
     font-size: 250%;
     color: #00ccff;
     text-align: center;
-    padding-top: 5%;
-    padding-bottom: 5%;
-    padding-inline: 5%;
+    padding: 5%;
 }
 
 #loginRadioLabel {

@@ -58,11 +58,8 @@ export function saveUserToDb(db, userData) {
         name: userData.name,
         surname: userData.surname,
         family_id: userData.family_id
-    }).onsuccess = (_) => {
-        window.location.replace(app.main)
-    }
-
-    getCardsFromDb(db).then(cards => {
+    }).onsuccess = async () => {
+        const cards = await getCardsFromDb(db)
         cards.forEach(card => {
             fetch(api.add_card, {
                 method: "POST",
@@ -70,7 +67,9 @@ export function saveUserToDb(db, userData) {
                 body: JSON.stringify(card)
             })
         })
-    })
+
+        window.location.replace(app.main)
+    }
 }
 
 export function getCardsFromDb(db) {
@@ -107,7 +106,6 @@ export function saveCardToDb(db, cardData, sync) {
                     let changes = JSON.parse(localStorage.getItem("changes"))
                     changes.push(change)
                     localStorage.setItem("changes", JSON.stringify(changes))
-                    alert(localStorage)
                 }
             })
         }

@@ -67,8 +67,9 @@ function showCards(include) {
     }
 
     const deleteCard = (event) => {
-        deleteCardFromDb(DB, event.target.parentElement.dataset.id)
-        .then(showCards)
+        if (confirm("Вы уверены, что хотите удалить карточку?"))
+            deleteCardFromDb(DB, event.target.parentElement.dataset.id)
+            .then(showCards)
     }
 
     const cardsContainer = $("#cardsContainer")
@@ -154,7 +155,7 @@ async function scanBarCode() {
                 cancelSending()
                 addNewCard(json.barcode, json.type)
             } else if (request.status == 408) {
-                alert("Вы в офлайне, некоторые функции недоступны")
+                alert("Сеервер не отвечает, некоторые функции недоступны")
                 cancelSending()
                 video.hide()
             } else {
@@ -191,13 +192,9 @@ async function scanBarCode() {
 
     $("#enterBarCode").click(() => {
         const code = $("#barCodeInput").val()
-        if (code.length < 13) {
+        if (code.length != 13) {
             $(".error").remove()
-            video.after(`<p class="error">Слишком короткий код</p>`)
-            return
-        } else if (code.length > 13) {
-            $(".error").remove()
-            video.after(`<p class="error">Слишком короткий код</p>`)
+            video.after(`<p class="error">Неверный код</p>`)
             return
         }
         cancelSending()
@@ -211,8 +208,9 @@ async function scanBarCode() {
 }
 
 //  ACCOUNT
-const sync = async () => {
-    fetch(api.get_cards).then(async (response) => {
+const sync = () => {
+    fetch(api.get_cards)
+    .then(async (response) => {
         let newCards = await response.json()
         newCards.personal.forEach(element => saveCardToDb(DB, element, true))
         showCards()
@@ -275,6 +273,10 @@ openDb(1).then((openedDb) => {
     showCards()
 })
 $("#addCard").click(scanBarCode)
+
+if (localStorage.length == 0) {
+    localStorage.setItem("changes", "[]")
+}
 
 //  SEARCH
 $("#searchCard").val("")

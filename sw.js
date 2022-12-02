@@ -27,7 +27,6 @@ self.addEventListener("install", (event) => {
 })
 
 const sendResponse = async (request) => {
-    const responseFromCache = await caches.match(request);
     try {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), 6000)
@@ -39,12 +38,10 @@ const sendResponse = async (request) => {
 
         return response
     } catch(error) {
-        if (responseFromCache) {
-            return responseFromCache
-        }
-        else {
-            return new Response("{}", { status: 408 })
-        }
+        const responseFromCache = await caches.match(request);
+
+        if (responseFromCache) return responseFromCache
+        else                   return new Response("{}", { status: 408 })
     }
 }
 
