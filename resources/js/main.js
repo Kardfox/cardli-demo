@@ -155,7 +155,7 @@ async function scanBarCode() {
                 cancelSending()
                 addNewCard(json.barcode, json.type)
             } else if (request.status == 408) {
-                alert("Сеервер не отвечает, некоторые функции недоступны")
+                alert("Сервер не отвечает, некоторые функции недоступны")
                 cancelSending()
                 video.hide()
             } else {
